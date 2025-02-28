@@ -18,25 +18,40 @@ interface NextApiResponseWithSocket extends NextApiRequest {
 
 const SocketHandler = (req: NextApiResponseWithSocket, res: NextApiResponse) => {
   if (req.socket.server.io) {
+    console.log('Socket is already running');
     res.end();
     return;
   }
 
+  console.log('Setting up socket');
   const io = new Server(req.socket.server, {
+    path: '/api/socket',
+    addTrailingSlash: false,
     cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
+      origin: '*',
+      methods: ['GET', 'POST'],
+      allowedHeaders: ['*'],
+      credentials: true,
+    },
+    transports: ['websocket', 'polling']
   });
   
   req.socket.server.io = io;
 
   io.on('connection', (socket) => {
+    console.log('Client connected');
+
     socket.on('new-message', (msg: Message) => {
+      console.log('New message received:', msg);
       io.emit('message-received', msg);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
     });
   });
 
+  console.log('Socket is set up');
   res.end();
 };
 

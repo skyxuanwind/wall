@@ -12,34 +12,53 @@ export default function MessagePage() {
   const [dream, setDream] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
 
-    if (!socket) {
-      await fetch('/api/socket');
-      socket = io('', {
-        path: '/api/socket',
-        addTrailingSlash: false
-      });
+    try {
+      if (!socket) {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const url = `${window.location.protocol}//${host}`;
+
+        await fetch('/api/socket');
+        socket = io(url, {
+          path: '/api/socket',
+          addTrailingSlash: false,
+          transports: ['websocket']
+        });
+
+        socket.on('connect_error', (error) => {
+          console.error('Socket connection error:', error);
+          setError('連接出現問題，請重試');
+          setIsSubmitting(false);
+        });
+      }
+
+      const newMessage = {
+        id: uuidv4(),
+        name,
+        message,
+        dream,
+        position: {
+          x: Math.random() * (window.innerWidth - 300),
+          y: Math.random() * (window.innerHeight - 200),
+        },
+        timestamp: Date.now(),
+      };
+
+      socket.emit('new-message', newMessage);
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setError('發送留言時出現問題，請重試');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const newMessage = {
-      id: uuidv4(),
-      name,
-      message,
-      dream,
-      position: {
-        x: Math.random() * (window.innerWidth - 300),
-        y: Math.random() * (window.innerHeight - 200),
-      },
-      timestamp: Date.now(),
-    };
-
-    socket.emit('new-message', newMessage);
-    setSubmitted(true);
-    setIsSubmitting(false);
   };
 
   if (submitted) {
@@ -58,6 +77,12 @@ export default function MessagePage() {
       <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 w-full max-w-md">
         <h1 className="text-2xl font-bold mb-6 text-center">留下您的祝福</h1>
         
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

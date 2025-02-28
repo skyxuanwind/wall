@@ -13,14 +13,28 @@ export default function Home() {
 
   useEffect(() => {
     const socketInitializer = async () => {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const host = window.location.host;
+      const url = `${window.location.protocol}//${host}`;
+      
       await fetch('/api/socket');
-      socket = io('', {
+      socket = io(url, {
         path: '/api/socket',
-        addTrailingSlash: false
+        addTrailingSlash: false,
+        transports: ['websocket']
+      });
+
+      socket.on('connect', () => {
+        console.log('Connected to socket');
       });
 
       socket.on('message-received', (msg: Message) => {
+        console.log('Received message:', msg);
         setMessages((prev) => [...prev, msg]);
+      });
+
+      socket.on('connect_error', (error) => {
+        console.error('Socket connection error:', error);
       });
     };
 
