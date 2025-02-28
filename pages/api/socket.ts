@@ -22,7 +22,13 @@ const SocketHandler = (req: NextApiResponseWithSocket, res: NextApiResponse) => 
     return;
   }
 
-  const io = new Server(req.socket.server);
+  const io = new Server(req.socket.server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+  
   req.socket.server.io = io;
 
   io.on('connection', (socket) => {

@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "public": true,
+  "functions": {
+    "pages/api/socket.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+} 
