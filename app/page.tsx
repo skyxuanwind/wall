@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { motion } from 'framer-motion';
 import type { Message } from '@/types/message';
 
-let socket: any;
+let socket: Socket | null = null;
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
