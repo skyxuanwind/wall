@@ -13,7 +13,6 @@ export default function Home() {
 
   useEffect(() => {
     const socketInitializer = async () => {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const host = window.location.host;
       const url = `${window.location.protocol}//${host}`;
       

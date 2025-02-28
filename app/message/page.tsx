@@ -21,7 +21,6 @@ export default function MessagePage() {
 
     try {
       if (!socket) {
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const host = window.location.host;
         const url = `${window.location.protocol}//${host}`;
 
