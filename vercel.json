@@ -1,6 +1,31 @@
 {
   "version": 2,
   "public": true,
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,POST,PUT,DELETE,OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With,Content-Type,Accept"
+        }
+      ]
+    }
+  ],
   "functions": {
     "pages/api/socket.ts": {
       "memory": 1024,

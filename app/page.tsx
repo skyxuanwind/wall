@@ -14,7 +14,10 @@ export default function Home() {
   useEffect(() => {
     const socketInitializer = async () => {
       await fetch('/api/socket');
-      socket = io();
+      socket = io('', {
+        path: '/api/socket',
+        addTrailingSlash: false
+      });
 
       socket.on('message-received', (msg: Message) => {
         setMessages((prev) => [...prev, msg]);

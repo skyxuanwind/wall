@@ -19,7 +19,10 @@ export default function MessagePage() {
 
     if (!socket) {
       await fetch('/api/socket');
-      socket = io();
+      socket = io('', {
+        path: '/api/socket',
+        addTrailingSlash: false
+      });
     }
 
     const newMessage = {
